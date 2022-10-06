@@ -46,7 +46,13 @@
                             <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>
                         </header>
                         <!-- Preview image figure-->
-                        <figure class="mb-4"><img class="img-fluid rounded" src="{{post.head_image.url}}" alt="{{p.title}}의 head_img" /></figure>
+                        <figure class="mb-4">
+                            {% if post.head_image%}
+                            <img class="img-fluid rounded" src="{{post.head_image.url}}" alt="{{p.title}}의 head_img" />
+                            {% else %}
+                            <img class="img-fluid rounded" src="https://picsum.photos/seed/{{post.pk}}/800/200"/>
+                            {% endif %}
+                        </figure>
                         <!-- Post content-->
                         <section class="mb-5">
                             <p class="fs-5 mb-4">{{post.content}}</p>
