@@ -9,6 +9,11 @@ class TestView(TestCase):
     def setUp(self):
         self.client = Client()
 
+    def nav_test(self,soup):
+        navbar = soup.nav
+        self.assertIn('Blog', navbar.text)
+        self.assertIn('AboutMe', navbar.text)
+
     def test_post_list(self):
         response = self.client.get('/blog/')
         self.assertEqual(response.status_code,200)
@@ -17,9 +22,11 @@ class TestView(TestCase):
 
         self.assertEqual(soup.title.text, 'Blog')
 
-        navbar = soup.nav
-        self.assertIn('Blogs', navbar.text)
-        self.assertIn('AboutMe', navbar.text)
+
+        #navbar = soup.nav
+        #self.assertIn('Blog', navbar.text)
+        #self.assertIn('AboutMe', navbar.text)
+        self.nav_test(soup)
 
         self.assertEqual(Post.objects.count(),0)
         main_area = soup.find('div', id="main-area")
@@ -45,9 +52,10 @@ class TestView(TestCase):
         self.assertEqual(response.status_code,200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        navbar = soup.nav
-        self.assertIn('Blog', navbar.text)
-        self.assertIn('AboutMe', navbar.text)
+        #navbar = soup.nav
+        #self.assertIn('Blog', navbar.text)
+        #self.assertIn('AboutMe', navbar.text)
+        self.nav_test(soup)
 
         self.assertIn(post_001.title, soup.title.text)
 
