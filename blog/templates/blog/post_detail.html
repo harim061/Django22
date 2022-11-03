@@ -16,9 +16,9 @@
                             <div class="text-muted fst-italic mb-2">Posted on {{post.created_at | date:"Y-m-d h:m:s"}} by {{post.author | upper}}</div>
                             <!-- Post categories-->
                             {% if post.category %}
-                                <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{post.category}}</a>
+                                <a class="badge bg-secondary text-decoration-none link-light" href="{{post.category.get_absolute_url}}">{{post.category}}</a>
                             {% else %}
-                                <a class="badge bg-secondary text-decoration-none link-light" href="#!">미분류</a>
+                                <a class="badge bg-secondary text-decoration-none link-light" href="/blog/category/no_category/">미분류</a>
                             {% endif %}
                         </header>
                         <!-- Preview image figure-->

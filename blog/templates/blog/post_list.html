@@ -18,9 +18,9 @@
               {% endif %}
             <div class="card-body">
                 {% if p.category %}
-                <span class="badge badge-secondary float-right">{{p.category}}</span>
+                <span class="badge badge-secondary float-right"><a href="{{p.category.get_absolute_url}}">{{p.category}}</a></span>
                 {% else %}
-                    <span class="badge badge-secondary float-right">미분류</span>
+                    <span class="badge badge-secondary float-right"><a href="/blog/category/no_category/">미분류</a></span>
                 {% endif %}
                 <h2 class="card-title">{{p.title | upper}}</h2>
                 {% if p.hook_text %}
