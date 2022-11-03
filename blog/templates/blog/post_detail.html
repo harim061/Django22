@@ -32,6 +32,14 @@
                         <!-- Post content-->
                         <section class="mb-5">
                             <p class="fs-5 mb-4">{{post.content}}</p>
+                            {% if post.tag.exists %}
+                                <i class="fas fa-tag"></i>
+                                {% for t in post.tag.iterator %}
+                                <span class="badge badge-pill badge-light">
+                                   <a href="{{t.get_absolute_url}}">{{t}}</a>
+                                </span>
+                                {% endfor %}
+                            {% endif %}
                                 {% if post.file_upload %}
                             <a href="{{post.file_upload.url}}" class="btn btn-outline-dark" role="button" download>
                                 {% if post.get_file_ext == 'xlsx' or post.get_file_ext == 'xls' %}
