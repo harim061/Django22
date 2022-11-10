@@ -3,11 +3,12 @@ from .models import Post,Category,Tag
 from django.views.generic import ListView,DetailView,CreateView,UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.utils.text import slugify
 # Create your views here.
 
 class PostUpdate(UpdateView):
     model = Post
-    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category','tag']
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
     template_name = 'blog/post_update_form.html'
     def dispatch(self, request, *args, **kwargs):
@@ -16,8 +17,30 @@ class PostUpdate(UpdateView):
         else:
             raise PermissionDenied
 
+    def form_valid(self, form):
+        response = super(PostUpdate,self).form_valid(form)
+        self.object.tag.clear()
+        tag_str = self.request.POST.get('tag_str')
+        if tag_str:
+            tag_str = tag_str.strip()
+            tag_str = tag_str.replace(',', ';')
+            tag_list = tag_str.split(';')
+            for t in tag_list:
+                t = t.strip()
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                if is_tag_created:
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+                self.object.tag.add(tag)
+        return response
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PostUpdate, self).get_context_data() ##템플릿에서 필요한 거 담아서 전달
+        if self.object.tag.exists():
+            tag_str_list = list()
+            for t in self.object.tag.all():
+                tag_str_list.append(t.name)
+            context['tag_str_default'] = ';'.join(tag_str_list)
         context['categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count
         return context
@@ -33,7 +56,20 @@ class PostCreate(LoginRequiredMixin,UserPassesTestMixin,CreateView):
         current_user = self.request.user
         if current_user.is_authenticated and (current_user.is_superuser or current_user.is_staff):
             form.instance.author = current_user
-            return super(PostCreate,self).form_valid(form)
+            response = super(PostCreate,self).form_valid(form)
+            tag_str = self.request.POST.get('tag_str')
+            if tag_str:
+                tag_str = tag_str.strip()
+                tag_str = tag_str.replace(',',';')
+                tag_list = tag_str.split(';')
+                for t in tag_list:
+                    t = t.strip()
+                    tag, is_tag_created =Tag.objects.get_or_create(name=t)
+                    if is_tag_created:
+                        tag.slug = slugify(t,allow_unicode = True)
+                        tag.save()
+                    self.object.tag.add(tag)
+            return response
         else:
             return redirect('/blog/')
 
