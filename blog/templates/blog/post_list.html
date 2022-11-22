@@ -3,7 +3,7 @@
 {% block main_area %}
         {% if user.is_authenticated %}
             {% if user.is_superuser or user.is_staff %}
-                <a href="/blog/create_post" role="button" class="btn btn-primary btn-sm float-right">
+                <a href="/blog/create_post" role="button" class="btn btn-primary btn-sm  float-right m-1">
                     <i class="fas fa-pen"></i> New Post
                 </a>
             {% endif %}
@@ -12,9 +12,9 @@
               {% if category %}
               - <span class="badge badge-secondary">{{ category }}</span>
               {% endif %}
-              {% if tag %}
-               - <i class="fas fa-tag"></i>
-              <span class="badge badge-secondary">{{ tag }} ({{tag.post_set.count}})</span>
+              {% if tags %}
+               - <i class="fas fa-tags"></i>
+              <span class="badge badge-secondary">{{ tags }} ({{tags.post_set.count}})</span>
               {% endif %}
           </h2>
           <!-- Featured blog post-->
@@ -37,9 +37,9 @@
                 <h5 class="text-muted">{{p.hook_text}}</h5>
                 {% endif %}
                 <p class="card-text">{{p.content | truncatechars:100}}</p>
-                {% if p.tag.exists %}
-                    <i class="fas fa-tag"></i>
-                    {% for t in p.tag.iterator %}
+                {% if p.tags.exists %}
+                    <i class="fas fa-tags"></i>
+                    {% for t in p.tags.iterator %}
                     <span class="badge badge-pill badge-light">
                         <a href="{{t.get_absolute_url}}">{{t}}</a>
                     </span>
