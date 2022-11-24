@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 from .froms import CommentForm
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 # Create your views here.
 class PostUpdate(UpdateView):
@@ -83,9 +84,11 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     # 템플릿 모델명_form.html : post_form.html (자동 생성>>템플릿 이름 명시 필요 없음)
 
+
 class PostList(ListView):
     model = Post
     ordering = '-pk'
+    paginate_by = 5
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PostList, self).get_context_data() ##템플릿에서 필요한 거 담아서 전달
@@ -95,6 +98,27 @@ class PostList(ListView):
 
     #템플릿 모델명_list.html : post_list.html (자동 생성>>템플릿 이름 명시 필요 없음)
     #파라미터 모델명_list : post_list
+
+
+class PostSearch(PostList):
+    paginate_by = None
+
+
+    def get_queryset(self):
+        q = self.kwargs['q']
+        post_list = Post.objects.filter(
+            Q(title__contains=q) | Q(tags__name__contains=q)
+        ).distinct()
+
+        return post_list
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(PostSearch,self).get_context_data()
+        q = self.kwargs['q']
+        context['search_info'] = f'Search : {q} ({self.get_queryset().count()})'
+        return context
+
+
 def new_comment(request,pk):
     if request.user.is_authenticated:
         post=get_object_or_404(Post,pk=pk)
